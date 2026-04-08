@@ -349,14 +349,20 @@ span {
 
 .slideshow-container {
     position: relative;
-    width: 1000px;
-    max-width: 100%;
-    aspect-ratio: 1000 / 600;
-    height: auto; /* Allow aspect-ratio to determine height */
+    width: 100%;
+    max-width: 800px;
+    height: 500px;
     overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    border: 8px solid #ffffff; /* Classic gallery frame edge */
     margin: 0 auto;
+    transition: var(--transition);
+}
+
+.slideshow-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 25px 60px rgba(212, 175, 55, 0.2);
 }
 
 .intro-slide, .vip-slide, .hall-slide, .dining-slide {
@@ -664,6 +670,10 @@ span {
     .hero-title {
         font-size: 3.5rem;
     }
+
+    .slideshow-container {
+        height: 350px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -700,5 +710,9 @@ span {
 
     .footer-grid {
         grid-template-columns: 1fr;
+    }
+
+    .slideshow-container {
+        height: 280px;
     }
 }
