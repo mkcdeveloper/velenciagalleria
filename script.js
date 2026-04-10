@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0. Initialize Lenis for liquid scrolling
     const lenis = new Lenis({
         duration: 2, // smooth and liquid length
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
         wheelMultiplier: 1.2
     });
@@ -17,21 +17,58 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0.1 Automatic Slideshow Logic for all sliders
     function startSlideshow(slideSelector, interval = 4000) {
         const slides = document.querySelectorAll(slideSelector);
-        let currentIndex = 0;
+        if (slides.length <= 1) return;
 
-        if (slides.length > 1) {
-            setInterval(() => {
-                slides[currentIndex].classList.remove('active');
-                currentIndex = (currentIndex + 1) % slides.length;
-                slides[currentIndex].classList.add('active');
-            }, interval);
+        const container = slides[0].parentElement;
+        const nextBtn = container.querySelector('.next-btn');
+        const prevBtn = container.querySelector('.prev-btn');
+
+        let currentIndex = 0;
+        let timer;
+
+        function showSlide(index) {
+            slides[currentIndex].classList.remove('active');
+            currentIndex = (index + slides.length) % slides.length;
+            slides[currentIndex].classList.add('active');
         }
+
+        function nextSlide() {
+            showSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentIndex - 1);
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(nextSlide, interval);
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                nextSlide();
+                startTimer();
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                prevSlide();
+                startTimer();
+            });
+        }
+
+        // Initialize timer
+        startTimer();
     }
 
-    startSlideshow('.intro-slide', 3000);
-    startSlideshow('.vip-slide', 3200); 
-    startSlideshow('.hall-slide', 2500); // fastest pace for the large hall gallery
-    startSlideshow('.dining-slide', 2800); // medium-fast pace for dining gallery
+    startSlideshow('.intro-slide', 3500);
+    startSlideshow('.vip-slide', 3800);
+    startSlideshow('.hall-slide', 3000);
+    startSlideshow('.dining-slide', 3200);
 
     // 1. Mobile Menu Toggle
     const hamburger = document.querySelector('.hamburger');
@@ -70,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rootMargin: "0px"
     };
 
-    const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+    const revealOnScroll = new IntersectionObserver(function (entries, observer) {
         entries.forEach(entry => {
             if (!entry.isIntersecting) {
                 return;
@@ -91,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         anchor.addEventListener('click', function (e) {
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
-            
+
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
                 e.preventDefault();
@@ -102,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon.classList.remove('fa-times');
                     icon.classList.add('fa-bars');
                 }
-                
+
                 lenis.scrollTo(targetElement);
             }
         });
@@ -118,12 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const allImages = [
             'images/introslide2.jpg', 'images/introslide3.jpg', 'images/introslide4.jpg', 'images/introslide5.jpg', 'images/introslide6.jpg',
             'images/vip2.jpg', 'images/vip3.jpg',
-            'images/hall2.jpg', 'images/hall3.jpg', 'images/hall5.jpg', 'images/hall6.jpg', 'images/hall7.jpg', 'images/hall8.jpg', 'images/hall9.jpg', 
-            'images/hall10.jpg', 'images/hall11.jpg', 'images/hall12.jpg', 'images/hall13.jpg', 'images/hall14.jpg', 'images/hall15.jpg', 
+            'images/hall2.jpg', 'images/hall3.jpg', 'images/hall5.jpg', 'images/hall6.jpg', 'images/hall7.jpg', 'images/hall8.jpg', 'images/hall9.jpg',
+            'images/hall10.jpg', 'images/hall11.jpg', 'images/hall12.jpg', 'images/hall13.jpg', 'images/hall14.jpg', 'images/hall15.jpg',
             'images/hall16.jpg', 'images/hall17.jpg', 'images/hall18.jpg',
-            'images/dinning1.jpg', 'images/dinning2.jpg', 'images/dinning3.jpg', 'images/dinning4.jpg', 'images/dinning5.jpg', 
-            'images/dinning6.jpg', 'images/dinning7.jpg', 'images/dinning8.jpg', 'images/dinning9.jpg', 'images/dinning10.jpg', 
-            'images/dinning11.jpg', 'images/dinning12.jpg', 'images/dinning13.jpg', 'images/dinning14.jpg', 'images/dinning15.jpg', 
+            'images/dinning1.jpg', 'images/dinning2.jpg', 'images/dinning3.jpg', 'images/dinning4.jpg', 'images/dinning5.jpg',
+            'images/dinning6.jpg', 'images/dinning7.jpg', 'images/dinning8.jpg', 'images/dinning9.jpg', 'images/dinning10.jpg',
+            'images/dinning11.jpg', 'images/dinning12.jpg', 'images/dinning13.jpg', 'images/dinning14.jpg', 'images/dinning15.jpg',
             'images/dinning16.jpg'
         ];
 
@@ -132,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Expand logic
                 allImages.forEach(imgSrc => {
                     const item = document.createElement('div');
-                    item.className = 'gallery-item dynamic-item reveal active'; 
+                    item.className = 'gallery-item dynamic-item reveal active';
                     item.innerHTML = `<img src="${imgSrc}" alt="Gallery">`;
                     dynamicGallery.appendChild(item);
                 });
@@ -144,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 extraImages.forEach(img => img.remove());
                 viewMoreBtn.innerText = 'View More Pictures';
                 isExpanded = false;
-                
+
                 // Scroll back up to the top of the gallery section
                 lenis.scrollTo('#gallery');
             }
