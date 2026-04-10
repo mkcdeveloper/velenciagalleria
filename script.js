@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnContainer.querySelector('button').addEventListener('click', resetGallery);
                 dynamicGallery.appendChild(btnContainer);
             }
-            
+
             viewMoreBtn.style.display = 'none';
         }
 
@@ -220,12 +220,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lightbox Logic
-    function openLightbox(src) {
+    let currentLightboxImages = [];
+    let currentLightboxIndex = 0;
+
+    function updateLightboxUI() {
+        if (currentLightboxImages.length === 0) return;
+        
+        const imgElement = currentLightboxImages[currentLightboxIndex];
+        lightboxImg.src = imgElement.src;
+        
+        const prevBtn = document.getElementById('lightbox-prev');
+        const nextBtn = document.getElementById('lightbox-next');
+        
+        // Hide/Show buttons based on index (Stop logic)
+        if (prevBtn) prevBtn.style.display = (currentLightboxIndex === 0) ? 'none' : 'block';
+        if (nextBtn) nextBtn.style.display = (currentLightboxIndex === currentLightboxImages.length - 1) ? 'none' : 'block';
+        
+        // Preload next image if available
+        if (currentLightboxIndex < currentLightboxImages.length - 1) {
+            const nextImg = new Image();
+            nextImg.src = currentLightboxImages[currentLightboxIndex + 1].src;
+        }
+    }
+
+    function openLightbox(clickedImg) {
         if (!lightbox || !lightboxImg) return;
-        lightboxImg.src = src;
+        
+        // Determine context: Specific slideshow or Gallery
+        const slideshowContainer = clickedImg.closest('.slideshow-container');
+        const galleryGrid = clickedImg.closest('#dynamic-gallery');
+        
+        if (slideshowContainer) {
+            // Stay within THIS specific slideshow only
+            currentLightboxImages = Array.from(slideshowContainer.querySelectorAll('img')).filter(img => !img.classList.contains('nav-logo'));
+        } else if (galleryGrid) {
+            // Stay within the gallery only
+            currentLightboxImages = Array.from(galleryGrid.querySelectorAll('img'));
+        } else {
+            currentLightboxImages = [clickedImg];
+        }
+        
+        currentLightboxIndex = currentLightboxImages.findIndex(img => img.src === clickedImg.src);
+        if (currentLightboxIndex === -1) {
+            currentLightboxImages = [clickedImg];
+            currentLightboxIndex = 0;
+        }
+
+        updateLightboxUI();
         lightbox.classList.add('active');
-        // Prevent body scroll
         document.body.style.overflow = 'hidden';
+    }
+
+    function nextLightboxImage() {
+        if (currentLightboxIndex < currentLightboxImages.length - 1) {
+            currentLightboxIndex++;
+            updateLightboxUI();
+        }
+    }
+
+    function prevLightboxImage() {
+        if (currentLightboxIndex > 0) {
+            currentLightboxIndex--;
+            updateLightboxUI();
+        }
     }
 
     function closeLightbox() {
@@ -235,29 +292,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (lightbox) {
-        // Close on X click
         lightboxClose.addEventListener('click', closeLightbox);
-        // Close on background click
+        
+        const nextBtn = document.getElementById('lightbox-next');
+        const prevBtn = document.getElementById('lightbox-prev');
+
+        if (nextBtn) nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextLightboxImage();
+        });
+        
+        if (prevBtn) prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            prevLightboxImage();
+        });
+
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) closeLightbox();
         });
     }
 
-    // Delegated click listener for all gallery and slideshow images
     document.addEventListener('click', (e) => {
         const target = e.target;
         if (target.tagName === 'IMG') {
             const isGallery = target.closest('.gallery-item');
             const isSlideshow = target.closest('.slideshow-container');
-
+            
             if (isGallery || isSlideshow) {
-                openLightbox(target.src);
+                openLightbox(target);
             }
         }
     });
 
-    // Close lightbox on Escape key
     window.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
         if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') nextLightboxImage();
+        if (e.key === 'ArrowLeft') prevLightboxImage();
     });
 });
