@@ -166,48 +166,57 @@ document.addEventListener('DOMContentLoaded', () => {
             'images/dinning16.jpg'
         ];
 
-        function shrinkGallery() {
-            const extraImages = document.querySelectorAll('.dynamic-item');
-            extraImages.forEach(img => img.remove());
+        let currentImageIndex = 0;
+        const imagesPerBatch = 3;
+
+        function loadBatch() {
+            // Remove existing View More button container if it exists
+            const existingContainer = document.querySelector('.view-more-container');
+            if (existingContainer) existingContainer.remove();
+
+            const end = Math.min(currentImageIndex + imagesPerBatch, allImages.length);
+            for (let i = currentImageIndex; i < end; i++) {
+                const item = document.createElement('div');
+                item.className = 'gallery-item dynamic-item reveal active';
+                item.innerHTML = `<img src="${allImages[i]}" alt="Gallery">`;
+                dynamicGallery.appendChild(item);
+            }
+
+            currentImageIndex = end;
+
+            if (currentImageIndex < allImages.length) {
+                // Add Small View More Button in a centered container
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'view-more-container';
+                btnContainer.innerHTML = `
+                    <button class="btn-small"><i class="fas fa-plus"></i> View More</button>
+                `;
+                btnContainer.querySelector('button').addEventListener('click', loadBatch);
+                dynamicGallery.appendChild(btnContainer);
+            } else {
+                // All loaded, show a "Show Less" button
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'view-more-container';
+                btnContainer.innerHTML = `
+                    <button class="btn-small"><i class="fas fa-minus"></i> Show Less</button>
+                `;
+                btnContainer.querySelector('button').addEventListener('click', resetGallery);
+                dynamicGallery.appendChild(btnContainer);
+            }
+            
+            viewMoreBtn.style.display = 'none';
+        }
+
+        function resetGallery() {
+            const extraItems = document.querySelectorAll('.dynamic-item, .view-more-container');
+            extraItems.forEach(item => item.remove());
+            currentImageIndex = 0;
+            viewMoreBtn.style.display = 'inline-block';
             viewMoreBtn.innerText = 'View More Pictures';
-            isExpanded = false;
             lenis.scrollTo('#gallery', { offset: -100 });
         }
 
-        viewMoreBtn.addEventListener('click', () => {
-            if (!isExpanded) {
-                allImages.forEach((imgSrc, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'gallery-item dynamic-item reveal active';
-                    item.innerHTML = `<img src="${imgSrc}" alt="Gallery">`;
-                    dynamicGallery.appendChild(item);
-
-                    if ((index + 1) % 2 === 0) {
-                        const lessTile = document.createElement('div');
-                        lessTile.className = 'gallery-item dynamic-item view-less-tile reveal active';
-                        lessTile.innerHTML = `<i class="fas fa-compress-alt"></i><span>VIEW LESS</span>`;
-                        lessTile.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            shrinkGallery();
-                        });
-                        dynamicGallery.appendChild(lessTile);
-                    }
-                });
-
-                if (allImages.length % 2 !== 0) {
-                    const finalLessTile = document.createElement('div');
-                    finalLessTile.className = 'gallery-item dynamic-item view-less-tile reveal active';
-                    finalLessTile.innerHTML = `<i class="fas fa-compress-alt"></i><span>VIEW LESS</span>`;
-                    finalLessTile.addEventListener('click', shrinkGallery);
-                    dynamicGallery.appendChild(finalLessTile);
-                }
-
-                viewMoreBtn.innerText = 'View Less Pictures';
-                isExpanded = true;
-            } else {
-                shrinkGallery();
-            }
-        });
+        viewMoreBtn.addEventListener('click', loadBatch);
     }
 
     // Lightbox Logic
@@ -240,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.tagName === 'IMG') {
             const isGallery = target.closest('.gallery-item');
             const isSlideshow = target.closest('.slideshow-container');
-            
+
             if (isGallery || isSlideshow) {
                 openLightbox(target.src);
             }
@@ -251,22 +260,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeLightbox();
     });
-
-    // 5. Hero Video Autoplay with Sound Logic
-    const heroVideo = document.querySelector('.hero-video');
-    if (heroVideo) {
-        const attemptPlay = () => {
-            heroVideo.play().catch(() => {
-                // If blocked, wait for first interaction
-                const playHandler = () => {
-                    heroVideo.play();
-                    document.removeEventListener('click', playHandler);
-                    document.removeEventListener('touchstart', playHandler);
-                };
-                document.addEventListener('click', playHandler);
-                document.addEventListener('touchstart', playHandler);
-            });
-        };
-        attemptPlay();
-    }
 });
