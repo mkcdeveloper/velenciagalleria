@@ -153,24 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxClose = document.querySelector('.lightbox-close');
     let isExpanded = false;
 
-    if (viewMoreBtn && dynamicGallery) {
-        const allImages = [
-            'images/introslide2.jpg', 'images/introslide3.jpg', 'images/introslide4.jpg', 'images/introslide5.jpg', 'images/introslide6.jpg',
-            'images/vip2.jpg', 'images/vip3.jpg',
-            'images/hall2.jpg', 'images/hall3.jpg', 'images/hall5.jpg', 'images/hall6.jpg', 'images/hall7.jpg', 'images/hall8.jpg', 'images/hall9.jpg',
-            'images/hall10.jpg', 'images/hall11.jpg', 'images/hall12.jpg', 'images/hall13.jpg', 'images/hall14.jpg', 'images/hall15.jpg',
-            'images/hall16.jpg', 'images/hall17.jpg', 'images/hall18.jpg',
-            'images/dinning1.jpg', 'images/dinning2.jpg', 'images/dinning3.jpg', 'images/dinning4.jpg', 'images/dinning5.jpg',
-            'images/dinning6.jpg', 'images/dinning7.jpg', 'images/dinning8.jpg', 'images/dinning9.jpg', 'images/dinning10.jpg',
-            'images/dinning11.jpg', 'images/dinning12.jpg', 'images/dinning13.jpg', 'images/dinning14.jpg', 'images/dinning15.jpg',
-            'images/dinning16.jpg'
-        ];
+    const allGalleryImages = [
+        'images/introslide1.jpg', 'images/introslide2.jpg', 'images/introslide3.jpg', 
+        'images/introslide4.jpg', 'images/introslide5.jpg', 'images/introslide6.jpg',
+        'images/vip1.jpg', 'images/vip2.jpg', 'images/vip3.jpg',
+        'images/hall1.jpg', 'images/hall2.jpg', 'images/hall3.jpg', 'images/hall5.jpg', 'images/hall6.jpg', 'images/hall7.jpg', 'images/hall8.jpg', 'images/hall9.jpg',
+        'images/hall10.jpg', 'images/hall11.jpg', 'images/hall12.jpg', 'images/hall13.jpg', 'images/hall14.jpg', 'images/hall15.jpg',
+        'images/hall16.jpg', 'images/hall17.jpg', 'images/hall18.jpg',
+        'images/dinning1.jpg', 'images/dinning2.jpg', 'images/dinning3.jpg', 'images/dinning4.jpg', 'images/dinning5.jpg',
+        'images/dinning6.jpg', 'images/dinning7.jpg', 'images/dinning8.jpg', 'images/dinning9.jpg', 'images/dinning10.jpg',
+        'images/dinning11.jpg', 'images/dinning12.jpg', 'images/dinning13.jpg', 'images/dinning14.jpg', 'images/dinning15.jpg',
+        'images/dinning16.jpg'
+    ];
+    const allImages = [...new Set(allGalleryImages)];
 
-        let currentImageIndex = 0;
+    if (viewMoreBtn && dynamicGallery) {
+        let currentImageIndex = 3; 
         const imagesPerBatch = 3;
 
         function loadBatch() {
-            // Remove existing View More button container if it exists
             const existingContainer = document.querySelector('.view-more-container');
             if (existingContainer) existingContainer.remove();
 
@@ -185,32 +186,25 @@ document.addEventListener('DOMContentLoaded', () => {
             currentImageIndex = end;
 
             if (currentImageIndex < allImages.length) {
-                // Add Small View More Button in a centered container
                 const btnContainer = document.createElement('div');
                 btnContainer.className = 'view-more-container';
-                btnContainer.innerHTML = `
-                    <button class="btn-small"><i class="fas fa-plus"></i> View More</button>
-                `;
+                btnContainer.innerHTML = `<button class="btn-small"><i class="fas fa-plus"></i> View More</button>`;
                 btnContainer.querySelector('button').addEventListener('click', loadBatch);
                 dynamicGallery.appendChild(btnContainer);
             } else {
-                // All loaded, show a "Show Less" button
                 const btnContainer = document.createElement('div');
                 btnContainer.className = 'view-more-container';
-                btnContainer.innerHTML = `
-                    <button class="btn-small"><i class="fas fa-minus"></i> Show Less</button>
-                `;
+                btnContainer.innerHTML = `<button class="btn-small"><i class="fas fa-minus"></i> Show Less</button>`;
                 btnContainer.querySelector('button').addEventListener('click', resetGallery);
                 dynamicGallery.appendChild(btnContainer);
             }
-
             viewMoreBtn.style.display = 'none';
         }
 
         function resetGallery() {
             const extraItems = document.querySelectorAll('.dynamic-item, .view-more-container');
             extraItems.forEach(item => item.remove());
-            currentImageIndex = 0;
+            currentImageIndex = 3;
             viewMoreBtn.style.display = 'inline-block';
             viewMoreBtn.innerText = 'View More Pictures';
             lenis.scrollTo('#gallery', { offset: -100 });
@@ -232,15 +226,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = document.getElementById('lightbox-prev');
         const nextBtn = document.getElementById('lightbox-next');
         
-        // Hide/Show buttons based on index (Stop logic)
-        if (prevBtn) prevBtn.style.display = (currentLightboxIndex === 0) ? 'none' : 'block';
-        if (nextBtn) nextBtn.style.display = (currentLightboxIndex === currentLightboxImages.length - 1) ? 'none' : 'block';
+        // Show navigation buttons if there's more than one image
+        if (prevBtn) prevBtn.style.display = (currentLightboxImages.length > 1) ? 'block' : 'none';
+        if (nextBtn) nextBtn.style.display = (currentLightboxImages.length > 1) ? 'block' : 'none';
         
-        // Preload next image if available
-        if (currentLightboxIndex < currentLightboxImages.length - 1) {
-            const nextImg = new Image();
-            nextImg.src = currentLightboxImages[currentLightboxIndex + 1].src;
-        }
+        // Preload next image if available (looping wrap-around)
+        const nextIndex = (currentLightboxIndex + 1) % currentLightboxImages.length;
+        const nextImg = new Image();
+        nextImg.src = currentLightboxImages[nextIndex].src;
     }
 
     function openLightbox(clickedImg) {
@@ -252,17 +245,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (slideshowContainer) {
             // Stay within THIS specific slideshow only
-            currentLightboxImages = Array.from(slideshowContainer.querySelectorAll('img')).filter(img => !img.classList.contains('nav-logo'));
+            currentLightboxImages = Array.from(slideshowContainer.querySelectorAll('img')).filter(img => !img.classList.contains('nav-logo')).map(img => ({ src: img.src }));
         } else if (galleryGrid) {
-            // Stay within the gallery only
-            currentLightboxImages = Array.from(galleryGrid.querySelectorAll('img'));
+            // Access ALL images from the gallery set even if not yet loaded in DOM
+            currentLightboxImages = allImages.map(src => ({ src: src }));
         } else {
-            currentLightboxImages = [clickedImg];
+            currentLightboxImages = [{ src: clickedImg.src }];
         }
         
-        currentLightboxIndex = currentLightboxImages.findIndex(img => img.src === clickedImg.src);
+        currentLightboxIndex = currentLightboxImages.findIndex(img => {
+            const absoluteSrc = clickedImg.src;
+            // Check if the source in our array matches the end of the absolute source
+            return absoluteSrc.endsWith(img.src);
+        });
+
         if (currentLightboxIndex === -1) {
-            currentLightboxImages = [clickedImg];
             currentLightboxIndex = 0;
         }
 
@@ -272,17 +269,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function nextLightboxImage() {
-        if (currentLightboxIndex < currentLightboxImages.length - 1) {
-            currentLightboxIndex++;
-            updateLightboxUI();
-        }
+        if (currentLightboxImages.length <= 1) return;
+        currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxImages.length;
+        updateLightboxUI();
     }
 
     function prevLightboxImage() {
-        if (currentLightboxIndex > 0) {
-            currentLightboxIndex--;
-            updateLightboxUI();
-        }
+        if (currentLightboxImages.length <= 1) return;
+        currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
+        updateLightboxUI();
     }
 
     function closeLightbox() {
