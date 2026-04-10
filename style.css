@@ -149,7 +149,8 @@ span {
     display: none;
 }
 
-.gallery-item img, .slideshow-container img {
+.gallery-item img,
+.slideshow-container img {
     cursor: pointer;
 }
 
@@ -174,6 +175,33 @@ span {
 
 .view-less-tile i {
     font-size: 2rem;
+}
+
+.view-more-container {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.btn-small {
+    padding: 8px 20px;
+    font-size: 0.8rem;
+    background: var(--primary);
+    color: #000;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+
+.btn-small:hover {
+    background: #000;
+    color: var(--primary);
+    transform: translateY(-2px);
 }
 
 /* Lightbox Modal */
@@ -235,7 +263,7 @@ span {
         right: 10px;
         font-size: 35px;
     }
-    
+
     .lightbox-content {
         max-width: 95%;
         max-height: 75%;
@@ -486,6 +514,7 @@ span {
     object-fit: cover;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
+    pointer-events: none; /* Prevent clicking hidden slides */
 }
 
 .intro-slide.active,
@@ -493,6 +522,7 @@ span {
 .hall-slide.active,
 .dining-slide.active {
     opacity: 1;
+    pointer-events: auto; /* Allow clicking the visible slide */
 }
 
 /* Slideshow Navigation Buttons */
