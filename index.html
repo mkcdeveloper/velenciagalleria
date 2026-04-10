@@ -38,7 +38,7 @@
 
     <!-- Hero Section -->
     <section class="hero" id="hero">
-        <video class="hero-video" autoplay loop muted playsinline>
+        <video class="hero-video" autoplay loop playsinline webkit-playsinline preload="auto" poster="images/introslide1.jpg">
             <source src="images/introvedio.MP4" type="video/mp4">
         </video>
         <div class="overlay"></div>
@@ -297,6 +297,12 @@
             <p>&copy; 2026 Valencia Galleria. All Rights Reserved.</p>
         </div>
     </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
 
     <script src="https://unpkg.com/lenis@1.1.9/dist/lenis.min.js"></script>
     <script src="script.js"></script>
