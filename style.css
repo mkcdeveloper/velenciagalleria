@@ -281,6 +281,45 @@ span {
     outline: none;
 }
 
+/* Lightbox Navigation */
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 3rem;
+    cursor: pointer;
+    z-index: 2200;
+    padding: 20px;
+    transition: var(--transition);
+    opacity: 0.7;
+    user-select: none;
+}
+
+.lightbox-nav:hover {
+    color: var(--primary);
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.lightbox-nav.prev {
+    left: 20px;
+}
+
+.lightbox-nav.next {
+    right: 20px;
+}
+
+@media (max-width: 768px) {
+    .lightbox-nav {
+        font-size: 2rem;
+        padding: 10px;
+    }
+    
+    .lightbox-nav.prev { left: 5px; }
+    .lightbox-nav.next { right: 5px; }
+}
+
 /* Navbar */
 .navbar {
     position: fixed;
@@ -514,7 +553,8 @@ span {
     object-fit: cover;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
-    pointer-events: none; /* Prevent clicking hidden slides */
+    pointer-events: none;
+    /* Prevent clicking hidden slides */
 }
 
 .intro-slide.active,
@@ -522,7 +562,8 @@ span {
 .hall-slide.active,
 .dining-slide.active {
     opacity: 1;
-    pointer-events: auto; /* Allow clicking the visible slide */
+    pointer-events: auto;
+    /* Allow clicking the visible slide */
 }
 
 /* Slideshow Navigation Buttons */
