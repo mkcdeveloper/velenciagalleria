@@ -315,9 +315,14 @@ span {
         font-size: 2rem;
         padding: 10px;
     }
-    
-    .lightbox-nav.prev { left: 5px; }
-    .lightbox-nav.next { right: 5px; }
+
+    .lightbox-nav.prev {
+        left: 5px;
+    }
+
+    .lightbox-nav.next {
+        right: 5px;
+    }
 }
 
 /* Navbar */
@@ -399,18 +404,25 @@ span {
     gap: 20px;
 }
 
-.nav-socials {
-    display: flex;
-    gap: 15px;
+.nav-book-btn {
+    font-size: 0.85rem;
+    padding: 10px 20px;
 }
 
-.nav-socials a {
+.mobile-socials {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.mobile-socials a {
     color: #1a1d24;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     transition: var(--transition);
 }
 
-.nav-socials a:hover {
+.mobile-socials a:hover {
     color: var(--primary);
     transform: translateY(-2px);
 }
@@ -420,12 +432,6 @@ span {
     cursor: pointer;
     font-size: 1.5rem;
     color: #1a1d24;
-}
-
-@media (max-width: 768px) {
-    .nav-socials {
-        display: none;
-    }
 }
 
 /* Buttons */
@@ -953,29 +959,24 @@ span {
         transition: max-height 0.5s ease-in-out;
     }
 
-.mobile-socials {
-    display: none;
-    gap: 20px;
-    justify-content: center;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
+    .mobile-socials {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        padding-top: 20px;
+        margin-top: 10px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
 
-.mobile-socials a {
-    font-size: 1.5rem;
-    color: var(--primary);
-}
+    .mobile-socials a {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
 
-@media (max-width: 768px) {
     .nav-links.active {
         max-height: 500px;
         padding: 20px;
     }
-
-    .mobile-socials {
-        display: flex;
-    }
-}
 
     .nav-links li {
         padding: 15px 0;
@@ -983,6 +984,10 @@ span {
 
     .hamburger {
         display: block;
+    }
+
+    .nav-book-btn {
+        display: none;
     }
 
     .hero-title {
