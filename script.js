@@ -145,13 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. Dynamic Gallery Loader with View Less Toggle
+    // 4. Dynamic Gallery Loader with View Less Toggle + Lightbox
     const viewMoreBtn = document.getElementById('view-more-btn');
     const dynamicGallery = document.getElementById('dynamic-gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.querySelector('.lightbox-close');
     let isExpanded = false;
 
     if (viewMoreBtn && dynamicGallery) {
-        // Pre-generate the allImages array
         const allImages = [
             'images/introslide2.jpg', 'images/introslide3.jpg', 'images/introslide4.jpg', 'images/introslide5.jpg', 'images/introslide6.jpg',
             'images/vip2.jpg', 'images/vip3.jpg',
@@ -164,27 +166,107 @@ document.addEventListener('DOMContentLoaded', () => {
             'images/dinning16.jpg'
         ];
 
+        function shrinkGallery() {
+            const extraImages = document.querySelectorAll('.dynamic-item');
+            extraImages.forEach(img => img.remove());
+            viewMoreBtn.innerText = 'View More Pictures';
+            isExpanded = false;
+            lenis.scrollTo('#gallery', { offset: -100 });
+        }
+
         viewMoreBtn.addEventListener('click', () => {
             if (!isExpanded) {
-                // Expand logic
-                allImages.forEach(imgSrc => {
+                allImages.forEach((imgSrc, index) => {
                     const item = document.createElement('div');
                     item.className = 'gallery-item dynamic-item reveal active';
                     item.innerHTML = `<img src="${imgSrc}" alt="Gallery">`;
                     dynamicGallery.appendChild(item);
+
+                    if ((index + 1) % 2 === 0) {
+                        const lessTile = document.createElement('div');
+                        lessTile.className = 'gallery-item dynamic-item view-less-tile reveal active';
+                        lessTile.innerHTML = `<i class="fas fa-compress-alt"></i><span>VIEW LESS</span>`;
+                        lessTile.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            shrinkGallery();
+                        });
+                        dynamicGallery.appendChild(lessTile);
+                    }
                 });
+
+                if (allImages.length % 2 !== 0) {
+                    const finalLessTile = document.createElement('div');
+                    finalLessTile.className = 'gallery-item dynamic-item view-less-tile reveal active';
+                    finalLessTile.innerHTML = `<i class="fas fa-compress-alt"></i><span>VIEW LESS</span>`;
+                    finalLessTile.addEventListener('click', shrinkGallery);
+                    dynamicGallery.appendChild(finalLessTile);
+                }
+
                 viewMoreBtn.innerText = 'View Less Pictures';
                 isExpanded = true;
             } else {
-                // Shrink logic
-                const extraImages = document.querySelectorAll('.dynamic-item');
-                extraImages.forEach(img => img.remove());
-                viewMoreBtn.innerText = 'View More Pictures';
-                isExpanded = false;
-
-                // Scroll back up to the top of the gallery section
-                lenis.scrollTo('#gallery');
+                shrinkGallery();
             }
         });
+    }
+
+    // Lightbox Logic
+    function openLightbox(src) {
+        if (!lightbox || !lightboxImg) return;
+        lightboxImg.src = src;
+        lightbox.classList.add('active');
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        if (!lightbox) return;
+        lightbox.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (lightbox) {
+        // Close on X click
+        lightboxClose.addEventListener('click', closeLightbox);
+        // Close on background click
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+    }
+
+    // Delegated click listener for all gallery and slideshow images
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.tagName === 'IMG') {
+            const isGallery = target.closest('.gallery-item');
+            const isSlideshow = target.closest('.slideshow-container');
+            
+            if (isGallery || isSlideshow) {
+                openLightbox(target.src);
+            }
+        }
+    });
+
+    // Close lightbox on Escape key
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+    });
+
+    // 5. Hero Video Autoplay with Sound Logic
+    const heroVideo = document.querySelector('.hero-video');
+    if (heroVideo) {
+        const attemptPlay = () => {
+            heroVideo.play().catch(() => {
+                // If blocked, wait for first interaction
+                const playHandler = () => {
+                    heroVideo.play();
+                    document.removeEventListener('click', playHandler);
+                    document.removeEventListener('touchstart', playHandler);
+                };
+                document.addEventListener('click', playHandler);
+                document.addEventListener('touchstart', playHandler);
+            });
+        };
+        attemptPlay();
     }
 });
